@@ -1,3 +1,3 @@
 {
-    "connectionString": "mongodb+srv://aimsUser:aimspassword@aimscluster.qjmjy.mongodb.net/?retryWrites=true&w=majority&appName=aimsCluster"
+    "connectionString": "11"
 }

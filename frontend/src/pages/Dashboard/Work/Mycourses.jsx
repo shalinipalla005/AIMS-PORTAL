@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL} from "../../../utils/constants";
 
 const MyCourses = () => {
     const [courses, setCourses] = useState([]); 
@@ -14,7 +15,7 @@ const MyCourses = () => {
 
     const fetchCourses = async () => {
         try {
-            const host = "http://localhost:8000";
+            const host = BASE_URL;
             const response = await fetch(`${host}/FetchCourses`, {
                 method: "GET",
                 headers: {

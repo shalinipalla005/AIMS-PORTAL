@@ -13,7 +13,8 @@ const jwt = require("jsonwebtoken");
 const { authenticateToken } = require("./utilities");
 const Course = require("./modals/course.modal");
 
-mongoose.connect(config.connectionString, {
+const connect=process.env.STRING;
+mongoose.connect(connect, {
   useNewUrlParser: true,
 });
 
@@ -396,7 +397,7 @@ app.get("/available-courses", authenticateToken, async (req, res) => {
     const enrolledCourses = await Course.find({
       "enrolledStudents.studentId": user._id,
     }).select("courseCode");
-
+    console.log(enrolledCourses);       
     const requestedCourses = enrolledCourses.map(course => course.courseCode);
 
     // Exclude courses that the student has already enrolled in or requested
@@ -445,7 +446,7 @@ app.post("/enroll-course", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: 'Course not found' });
     }
 
-    const response = await fetch('http://localhost:8000/facultyadvisor', {
+    const response = await fetch(`${process.env.HOST}/facultyadvisor`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -459,8 +460,8 @@ app.post("/enroll-course", authenticateToken, async (req, res) => {
 
     const json = await response.json();
     const instructors = json.instructors;
-
-    const facultyadvisor = instructors.find((instructor) => instructor.department === user.department);
+    
+    const facultyadvisor = instructors.findOne((instructor) => instructor.department === user.department);
     if (!facultyadvisor) {
       return res.status(404).json({ message: 'No faculty advisor found for this department' });
     }
@@ -594,16 +595,27 @@ app.post("/facultyadvisor", authenticateToken, async (req, res) => {
 app.get("/getApproved", authenticateToken, async (req, res) => {
   const { user } = req.user;
   try {
-    const courses = await Course.find({ "enrolledStudents.faculty": user._id });
-    const pendingEnrollments = courses.map((course) => ({
-      courseId: course._id,
-      courseTitle: course.title,
-      courseCode: course.courseCode,
-      pendingStudents: course.enrolledStudents.filter(
-        (student) => student.status === "Pending for FA"
-      ),
-    }));
-    res.status(200).json({ error: false, pendingEnrollments });
+    const courses = await Course.find({});
+    const filteredCourses = courses
+      .map((course) => {
+        const departmentStudents = course.enrolledStudents.filter(
+          (student) => student.department === user.department
+        );
+        if (departmentStudents.length > 0) {
+          return {
+            courseId: course._id,
+            courseTitle: course.title,
+            courseCode: course.courseCode,
+            pendingStudents: departmentStudents.filter(
+              (student) => student.status === "Pending for FA"
+            ),
+          };
+        }
+        return null; 
+      })
+      .filter((course) => course !== null); 
+    console.log("Pending Approvals", filteredCourses);
+    res.status(200).json({ error: false, pendingEnrollments: filteredCourses });
   } catch (error) {
     console.error("Failed to fetch pending enrollments:", error);
     res.status(500).json({ error: true, message: "Failed to fetch requests" });

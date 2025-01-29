@@ -5,15 +5,14 @@ import { useNavigate } from "react-router-dom";
 
 const CourseValidation = () => {
   const [pendingEnrollments, setPendingEnrollments] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1); // Track the current page
-  const coursesPerPage = 3; // Number of courses to show per page
+  const [currentPage, setCurrentPage] = useState(1); 
+  const coursesPerPage = 3; 
   const navigate = useNavigate();
 
   const fetchPendingEnrollments = async () => {
     try {
       const response = await axiosInstance.get("/getApproved");
       if (response.data && !response.data.error) {
-        // Filter out courses with no pending students
         const filteredEnrollments = response.data.pendingEnrollments.filter(
           (course) => course.pendingStudents.length > 0
         );
@@ -37,7 +36,7 @@ const CourseValidation = () => {
       console.log(response.data);
       if (response.data && !response.data.error) {
         alert(response.data.message);
-        fetchPendingEnrollments(); // Refresh the data
+        fetchPendingEnrollments(); 
       } else {
         alert("Failed to update status.");
       }

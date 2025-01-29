@@ -39,8 +39,10 @@ const AddUser = () => {
                     department: "",
                     fa: false,
                 });
+                alert("User Created");
             }
         } catch (error) {
+            alert("Failed to Create User");
             if (error.response && error.response.data && error.response.data.message) {
                 setError(error.response.data.message);
             } else {

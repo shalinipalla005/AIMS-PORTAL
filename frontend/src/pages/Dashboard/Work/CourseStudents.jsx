@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { BASE_URL} from "../../../utils/constants";
 
 const CourseStudents = () => {
     const location = useLocation();
@@ -11,7 +12,7 @@ const CourseStudents = () => {
       console.log(courseCode);
     const fetchStudents = async () => {
         try {
-            const host = "http://localhost:8000";
+            const host = BASE_URL;
             const accessToken = localStorage.getItem("token");
             if (!accessToken) {
                 alert("Unauthorized! Please log in again.");
