@@ -41,6 +41,12 @@ const Home = () => {
     getUserInfo();
   }, []);
 
+  useEffect(() => {
+    if (userInfo === null) {
+      navigate("/login");
+    }
+  }, [userInfo, navigate]);
+
   // Render appropriate dashboard based on user category
   const renderDashboard = () => {
     if (!userInfo) {
